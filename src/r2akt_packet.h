@@ -84,24 +84,28 @@ KISS Protocol
 ///
 	#define packetTransmit HIGH
 	#define packetReceive LOW
+	#define TxDelay 10
+	#define TxTail 10
 
  /******************************************************************************/
 	class Packet : public Stream {
 		public:
-			Packet (Stream *Port, uint8_t SrcAddr, uint16_t BuffSize = 64, bool COBS_KISS = true, uint8_t ToglePin = 13, bool Blocking = false);
-			int8_t begin ();
+			Packet (Stream *Port, uint8_t SrcAddr, uint16_t BuffSize = 64, bool COBS_KISS = false, uint8_t ToglePin = 13, bool Blocking = false, uint16_t TimeOut = 1000);
+			void begin (const uint8_t SrcAddr = 0x0);
+			//
 			int16_t send_phy (const uint8_t *Buff, const size_t size);
-			int16_t receive_phy (uint8_t *Buff, bool Blocking = false);
+			int16_t receive_phy (uint8_t *Buff, bool Blocking = false, uint16_t TimeOut = 0);
 			//
 			int16_t send_mac (const uint8_t DstAddr, const uint8_t *Buff, const size_t size);
-			int16_t receive_mac (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking = false);
+			int16_t receive_mac (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking = false, uint16_t TimeOut = 0);
 			//
 			int16_t packet_send_to (const uint8_t DstAddr, const uint8_t *Buff, const uint16_t size);
-			int16_t packet_receive_from (uint8_t *Buff, const uint8_t SrcAddr, bool Blocking = false);
-			int16_t packet_receive (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking = false);
+			int16_t packet_receive_from (uint8_t *Buff, const uint8_t SrcAddr, bool Blocking = false, uint16_t TimeOut = 0);
+			int16_t packet_receive (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking = false, uint16_t TimeOut = 0);
 			//
-			int8_t error_num;
-
+			int8_t PHY_Error_Num;
+			int8_t MAC_Error_Num;
+			int8_t PACKET_Error_Num;
 //
 		private:
 			Stream *_Port;
@@ -111,9 +115,13 @@ KISS Protocol
 			uint16_t _PacketBuffSize;
 			uint8_t _ToglePin;
 			bool _Blocking;
-///
+			uint16_t _TimeOut;
+			//
+			void setRXmode(void);
+			void setTXmode(void);
+			//
 			uint8_t *PHY_Exchange_Rx;
-//
+			///
 			struct phy_packet_status_struct {
 				bool packet_Rx_Sync;
 				size_t packet_Rx_Len;
@@ -125,9 +133,6 @@ KISS Protocol
 				uint8_t SrcAddr;
 				uint8_t Data[];
 			};
-
-			inline void setTXmode() { digitalWrite (_ToglePin, packetTransmit); DEBUG_PRINTLN ("Togle pin - Tx.");};
-			inline void setRXmode() { digitalWrite (_ToglePin, packetReceive); DEBUG_PRINTLN ("Togle pin - Rx.");};
 
 			// Stream interface
 			int available();
