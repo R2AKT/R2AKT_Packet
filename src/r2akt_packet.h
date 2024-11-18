@@ -1,10 +1,10 @@
  /******************************************************************************
  *
- *    FILE NAME : r2akt_packet.cpp
+ *    FILE NAME : r2akt_packet.h
  *       AUTHOR : Sergey Dorozhkin (R2AKT)
- *         DATE : 30-april-2024
- *      VERSION : 0.0.1
- * MODIFICATION : 1
+ *         DATE : 15-november-2024
+ *      VERSION : 0.0.2
+ * MODIFICATION : 2
  *      PURPOSE : Arduino library for packet data exchange
  *          URL : https://github.com/R2AKT/r2akt_packet
  *

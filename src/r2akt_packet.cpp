@@ -2,9 +2,9 @@
  *
  *    FILE NAME : r2akt_packet.cpp
  *       AUTHOR : Sergey Dorozhkin (R2AKT)
- *         DATE : 30-april-2024
- *      VERSION : 0.0.1
- * MODIFICATION : 1
+ *         DATE : 15-november-2024
+ *      VERSION : 0.0.2
+ * MODIFICATION : 2
  *      PURPOSE : Arduino library for packet data exchange
  *          URL : https://github.com/R2AKT/r2akt_packet
  *
@@ -12,7 +12,7 @@
 #include <r2akt_packet.h>
 
  /******************************************************************************/
-Packet::Packet (Stream *Port, uint8_t SrcAddr, uint16_t BuffSize = 64, bool COBS_KISS = false, uint8_t ToglePin = 13, bool Blocking = false, uint16_t TimeOut = 1000) {
+Packet::Packet (Stream *Port, uint8_t SrcAddr, uint16_t BuffSize, bool COBS_KISS, uint8_t ToglePin, bool Blocking, uint16_t TimeOut) {
 	_Port = Port;
 	_SrcAddr = SrcAddr;
 	_BuffSize = BuffSize;
@@ -39,7 +39,7 @@ Packet::Packet (Stream *Port, uint8_t SrcAddr, uint16_t BuffSize = 64, bool COBS
 	PACKET_Error_Num = error_num_no_error;
 }
 //
-void Packet::begin (const uint8_t SrcAddr = 0x0) {
+void Packet::begin (const uint8_t SrcAddr) {
 	_SrcAddr = SrcAddr;
 	if (_ToglePin != 0) {
 		pinMode (_ToglePin, OUTPUT);
@@ -101,7 +101,7 @@ size_t Packet::write (const uint8_t c) {
 	return n;
 }
 //
-size_t Packet::write (const char * array, size_t size) {
+size_t Packet::write (const char *array, size_t size) {
 	int16_t n = write ((uint8_t *)array, size);
 	if (n > 0) {
 		PHY_Error_Num = error_num_no_error;
@@ -111,7 +111,7 @@ size_t Packet::write (const char * array, size_t size) {
 	return n;
 }
 //
-size_t Packet::write (const uint8_t * array, size_t size) {
+size_t Packet::write (const uint8_t *array, size_t size) {
 	size_t n = _Port->write (array, size);
 	_Port->flush();
 	if (n > 0) {
@@ -149,7 +149,7 @@ int16_t Packet::send_phy (const uint8_t *Buff, const size_t size) {
 		RAW_BuffSize = (size + 4) * 2;
 	}
 
-	uint8_t *PHY_Exchange_Tx = new uint8_t (RAW_BuffSize);
+	uint8_t *PHY_Exchange_Tx = new uint8_t [RAW_BuffSize];
 	if (_COBS) { // COBS
 		RAW_Len = StuffData (PHY_Exchange_Tx, Buff, size);
 	} else { // KISS (SLIP)
@@ -204,7 +204,7 @@ int16_t Packet::send_phy (const uint8_t *Buff, const size_t size) {
 	return RAW_Len;
 }
  /******************************************************************************/
-int16_t Packet::receive_phy (uint8_t *Buff, bool Blocking = false, uint16_t TimeOut = 0) {
+int16_t Packet::receive_phy (uint8_t *Buff, bool Blocking, uint16_t TimeOut) {
 	setRXmode();//digitalWrite (BusTxToglePin, RS485Receive); // Enable RS-485 Rx Data
 	//
 	uint16_t RxBuffLen;
@@ -321,7 +321,7 @@ int16_t Packet::send_mac (const uint8_t DstAddr, const uint8_t *Buff, const size
 		MAC_Error_Num = error_num_oversize;
 		return -1;
 	}
-	uint8_t* MAC_Packet_Tx = new uint8_t [size + 2];
+	uint8_t *MAC_Packet_Tx = new uint8_t [size + 2];
 
 	///
 	DEBUG_PRINT (F ("MAC Destination address "));
@@ -360,8 +360,8 @@ int16_t Packet::send_mac (const uint8_t DstAddr, const uint8_t *Buff, const size
 	}
 }
  /******************************************************************************/
-int16_t Packet::receive_mac (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking = false, uint16_t TimeOut = 0) {
-	uint8_t* MAC_Packet_Rx = new uint8_t [_BuffSize + 2];
+int16_t Packet::receive_mac (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking, uint16_t TimeOut) {
+	uint8_t *MAC_Packet_Rx = new uint8_t [_BuffSize + 2];
 	int16_t phy_rx_len;
 	uint16_t WaitTime;
 	unsigned long StartTime;
@@ -453,7 +453,7 @@ int16_t Packet::packet_send_to (const uint8_t DstAddr, const uint8_t *Buff, cons
 	}
 }
  /******************************************************************************/
-int16_t Packet::packet_receive_from (uint8_t *Buff, const uint8_t SrcAddr, bool Blocking = false, uint16_t TimeOut = 0) {
+int16_t Packet::packet_receive_from (uint8_t *Buff, const uint8_t SrcAddr, bool Blocking, uint16_t TimeOut) {
 	uint8_t RxSrcAddr;
 	int16_t mac_rx_len;
 	uint8_t *MAC_Data = new uint8_t [_BuffSize + 2];
@@ -528,7 +528,7 @@ int16_t Packet::packet_receive_from (uint8_t *Buff, const uint8_t SrcAddr, bool 
 	return -1;
 }
  /******************************************************************************/
-int16_t Packet::packet_receive (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking = false, uint16_t TimeOut = 0) {
+int16_t Packet::packet_receive (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking, uint16_t TimeOut) {
 	uint8_t RxSrcAddr;
 	int16_t mac_rx_len;
 	uint8_t *MAC_Data = new uint8_t [_BuffSize + 2];
