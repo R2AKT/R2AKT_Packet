@@ -2,9 +2,9 @@
  *
  *    FILE NAME : r2akt_packet.h
  *       AUTHOR : Sergey Dorozhkin (R2AKT)
- *         DATE : 15-november-2024
+ *         DATE : 27-november-2024
  *      VERSION : 0.0.2
- * MODIFICATION : 2
+ * MODIFICATION : 3
  *      PURPOSE : Arduino library for packet data exchange
  *          URL : https://github.com/R2AKT/r2akt_packet
  *
@@ -111,8 +111,8 @@ KISS Protocol
 			Stream *_Port;
 			uint8_t _SrcAddr;
 			bool _COBS;
-			uint16_t _BuffSize;
-			uint16_t _PacketBuffSize;
+			size_t _BuffSize;
+			size_t _PacketBuffSize;
 			uint8_t _ToglePin;
 			bool _Blocking;
 			uint16_t _TimeOut;
@@ -122,18 +122,15 @@ KISS Protocol
 			//
 			uint8_t *PHY_Exchange_Rx;
 			///
-			struct phy_packet_status_struct {
-				bool packet_Rx_Sync;
-				size_t packet_Rx_Len;
-			};
+			#pragma pack (push, 1)
+				struct phy_packet_status_struct {
+					bool packet_Rx_Sync;
+					size_t packet_Rx_Len;
+				};
+			#pragma pack (pop)
+			//
 			phy_packet_status_struct PHY_Packet_Status = {};
-
-			struct mac_packet_struct {
-				uint8_t DstAddr;
-				uint8_t SrcAddr;
-				uint8_t Data[];
-			};
-
+			//
 			// Stream interface
 			int available();
 			int read();

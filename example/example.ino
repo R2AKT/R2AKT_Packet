@@ -29,8 +29,8 @@ void setup() {
 
   uint8_t Buff[] = {0xFF,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0x88,0x77,0x66,0x55,0x44,0x33,0x22,0x11,0x0};
   uint8_t mac_dst_addr = 0x01;
-  //packet.send_phy (Buff, sizeof (Buff)/sizeof(Buff[0]));
-  //packet.send_mac (mac_dst_addr, Buff, sizeof (Buff)/sizeof (Buff[0]));
+  packet.send_phy (Buff, sizeof (Buff)/sizeof(Buff[0]));
+  packet.send_mac (mac_dst_addr, Buff, sizeof (Buff)/sizeof (Buff[0]));
   packet.packet_send_to (mac_dst_addr, Buff, sizeof (Buff)/sizeof (Buff[0]));
 }
 

@@ -2,9 +2,9 @@
  *
  *    FILE NAME : r2akt_packet.cpp
  *       AUTHOR : Sergey Dorozhkin (R2AKT)
- *         DATE : 15-november-2024
+ *         DATE : 27-november-2024
  *      VERSION : 0.0.2
- * MODIFICATION : 2
+ * MODIFICATION : 3
  *      PURPOSE : Arduino library for packet data exchange
  *          URL : https://github.com/R2AKT/r2akt_packet
  *
@@ -25,7 +25,7 @@ Packet::Packet (Stream *Port, uint8_t SrcAddr, uint16_t BuffSize, bool COBS_KISS
 	_Blocking = Blocking;
 	_TimeOut = TimeOut;
 	//
-	uint16_t PacketBuffSize;
+	uint16_t PacketBuffSize = 0;
 	if (_COBS) { // COBS
 		PacketBuffSize = _BuffSize+5;
 	} else { // KISS (SLIP)
@@ -207,10 +207,10 @@ int16_t Packet::send_phy (const uint8_t *Buff, const size_t size) {
 int16_t Packet::receive_phy (uint8_t *Buff, bool Blocking, uint16_t TimeOut) {
 	setRXmode();//digitalWrite (BusTxToglePin, RS485Receive); // Enable RS-485 Rx Data
 	//
-	uint16_t RxBuffLen;
-	uint16_t WaitTime;
-	unsigned long StartTime;
-	bool Block;
+	uint16_t RxBuffLen = 0;
+	uint16_t WaitTime = 0;
+	unsigned long StartTime = 0;
+	bool Block = false;
 	//
 	if (Blocking || _Blocking) {
 		Block = true;
@@ -221,6 +221,7 @@ int16_t Packet::receive_phy (uint8_t *Buff, bool Blocking, uint16_t TimeOut) {
 		}
 	} else {
 		Block = false;
+		WaitTime = 0;
 	}
 	//
 	StartTime = millis();
@@ -362,10 +363,10 @@ int16_t Packet::send_mac (const uint8_t DstAddr, const uint8_t *Buff, const size
  /******************************************************************************/
 int16_t Packet::receive_mac (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking, uint16_t TimeOut) {
 	uint8_t *MAC_Packet_Rx = new uint8_t [_BuffSize + 2];
-	int16_t phy_rx_len;
-	uint16_t WaitTime;
-	unsigned long StartTime;
-	bool Block;
+	int16_t phy_rx_len = 0;
+	uint16_t WaitTime = 0;
+	unsigned long StartTime = 0;
+	bool Block = false;
 	//
 	if (Blocking || _Blocking) {
 		Block = true;
@@ -376,6 +377,7 @@ int16_t Packet::receive_mac (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking, uin
 		}
 	} else {
 		Block = false;
+		WaitTime = 0;
 	}
 	//
 	StartTime = millis();
@@ -455,12 +457,12 @@ int16_t Packet::packet_send_to (const uint8_t DstAddr, const uint8_t *Buff, cons
  /******************************************************************************/
 int16_t Packet::packet_receive_from (uint8_t *Buff, const uint8_t SrcAddr, bool Blocking, uint16_t TimeOut) {
 	uint8_t RxSrcAddr;
-	int16_t mac_rx_len;
+	int16_t mac_rx_len = 0;
 	uint8_t *MAC_Data = new uint8_t [_BuffSize + 2];
-	uint16_t Rx_CRC;
-	uint16_t WaitTime;
+	uint16_t Rx_CRC = 0;
+	uint16_t WaitTime = 0;
 	unsigned long StartTime;
-	bool Block;
+	bool Block = false;
 	//
 	if (Blocking || _Blocking) {
 		Block = true;
@@ -471,6 +473,7 @@ int16_t Packet::packet_receive_from (uint8_t *Buff, const uint8_t SrcAddr, bool 
 		}
 	} else {
 		Block = false;
+		WaitTime = 0;
 	}
 	//
 	StartTime = millis();
@@ -530,12 +533,12 @@ int16_t Packet::packet_receive_from (uint8_t *Buff, const uint8_t SrcAddr, bool 
  /******************************************************************************/
 int16_t Packet::packet_receive (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking, uint16_t TimeOut) {
 	uint8_t RxSrcAddr;
-	int16_t mac_rx_len;
+	int16_t mac_rx_len = 0;
 	uint8_t *MAC_Data = new uint8_t [_BuffSize + 2];
-	uint16_t Rx_CRC;
-	uint16_t WaitTime;
-	unsigned long StartTime;
-	bool Block;
+	uint16_t Rx_CRC = 0;
+	uint16_t WaitTime = 0;
+	unsigned long StartTime = 0;
+	bool Block = false;
 	//
 	if (Blocking || _Blocking) {
 		Block = true;
@@ -546,6 +549,7 @@ int16_t Packet::packet_receive (uint8_t *Buff, uint8_t *SrcAddr, bool Blocking, 
 		}
 	} else {
 		Block = false;
+		WaitTime = 0;
 	}
 	//
 	StartTime = millis();
